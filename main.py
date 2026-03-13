@@ -2,18 +2,12 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import torch
 import numpy as np
+import os
+import uvicorn
 
 from model import PPGtoBPNet
 
 app = FastAPI()
-
-@app.get("/")
-def root():
-    return {"message":"API running"}
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    uvicorn.run(app, host="0.0.0.0", port=port)
 
 device = torch.device("cpu")
 
@@ -37,7 +31,6 @@ def predict(data: SignalInput):
 
     signal = np.array(data.signal)
 
-    # normalize like training
     signal = (signal - signal.mean()) / (signal.std()+1e-6)
 
     tensor = torch.tensor(signal).float().unsqueeze(0).unsqueeze(0)
@@ -52,3 +45,8 @@ def predict(data: SignalInput):
         "systolic": systolic,
         "diastolic": diastolic
     }
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
