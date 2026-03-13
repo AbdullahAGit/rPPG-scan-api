@@ -7,6 +7,14 @@ from model import PPGtoBPNet
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"message":"API running"}
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
 device = torch.device("cpu")
 
 # load model once when server starts
